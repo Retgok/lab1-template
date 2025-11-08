@@ -26,7 +26,7 @@ jobs:
         run: dotnet restore ./src/Person.sln
 
       - name: Build
-        run: dotnet build ./src/Person.sln --configuration Release --no-restore -o PersonPublish
+        run: dotnet build ./src/Person.sln --configuration Release --no-restore
 
       - name: Run tests
         run: dotnet test ./src/Person.Tests/Person.Tests.csproj --verbosity normal
