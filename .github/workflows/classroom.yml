@@ -20,7 +20,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '9.0.x'
 
       - name: Restore dependencies
         run: dotnet restore ./src/Person.sln
@@ -31,25 +31,11 @@ jobs:
       - name: Run tests
         run: dotnet test ./src/Person.Tests/Person.Tests.csproj --verbosity normal
 
-      - name: Log in to GitHub Container Registry
-        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Build Docker image
-        run: |
-          USERNAME=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          IMAGE=ghcr.io/${USERNAME}/person:latest
-          docker build -t $IMAGE .
-          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
-
-      - name: Push Docker image
-        run: docker push ${{ env.IMAGE }}
-
       - name: Deploy to Render
         uses: johnbeynon/render-deploy-action@v0.0.8
         with:
           service-id: ${{ secrets.RENDER_SERVICE_ID }}
           api-key: ${{ secrets.RENDER_API_KEY }}
-          wait-for-success: true
 
       - name: Run API Tests
         uses: matt-ball/newman-action@master
@@ -62,13 +48,3 @@ jobs:
       - name: Autograding
         uses: education/autograding@v1
         continue-on-error: true
-
-      # - name: Github auto grader mark
-      #   uses: Romanow/google-sheet-autograder-marker@v1.0
-      #   with:
-      #     google_token: ${{secrets.GOOGLE_API_KEY}}
-      #     sheet_id: "1xkgjUX6Qmk7rdJG-QPOToav-HWWtthJjnShIKnw3oIY"
-      #     homework_number: 1
-      #     user_column: 'D'
-      #     column_offset: 'F'
-      #     mark: "'+"
