@@ -5,8 +5,15 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddEnvironmentVariables();
+var connectionString = Environment.GetEnvironmentVariable("DB_CONN_STR")
+                       ?? builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<PersonDb>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
+
+// builder.Services.AddDbContext<PersonDb>(options =>
+//     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.Configure<JsonOptions>(options =>
 {
